@@ -127,8 +127,7 @@ fn read_i32(file: &mut std::fs::File) -> i32
 
 fn write_i8(file: &mut std::fs::File, num: i8)
 {
-    let mut buffer = [0u8; 1];
-    buffer[0] = unsafe {std::mem::transmute(num)};
+    let buffer = [num as u8];
     file.write(&buffer).unwrap();
 }
 
