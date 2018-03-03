@@ -1,0 +1,7 @@
+[package]
+name = "serial-arduino"
+version = "0.1.0"
+authors = ["Antonin <antonin.raffin@ensta.org>"]
+
+[dependencies]
+serial = "0.4"

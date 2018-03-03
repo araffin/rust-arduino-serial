@@ -1,0 +1,74 @@
+[[package]]
+name = "ioctl-rs"
+version = "0.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "libc 0.2.33 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "libc"
+version = "0.2.33"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "serial"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "serial-core 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serial-unix 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serial-windows 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "serial-arduino"
+version = "0.1.0"
+dependencies = [
+ "serial 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "serial-core"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "libc 0.2.33 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "serial-unix"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "ioctl-rs 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.2.33 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serial-core 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "termios 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "serial-windows"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "libc 0.2.33 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serial-core 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "termios"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "libc 0.2.33 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[metadata]
+"checksum ioctl-rs 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)" = "c733bd6be680c4365bfeb89ac48d4c39ee2c47d933da3601689131471aaf3267"
+"checksum libc 0.2.33 (registry+https://github.com/rust-lang/crates.io-index)" = "5ba3df4dcb460b9dfbd070d41c94c19209620c191b0340b929ce748a2bcd42d2"
+"checksum serial 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "a1237a96570fc377c13baa1b88c7589ab66edced652e43ffb17088f003db3e86"
+"checksum serial-core 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "3f46209b345401737ae2125fe5b19a77acce90cd53e1658cda928e4fe9a64581"
+"checksum serial-unix 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "f03fbca4c9d866e24a459cbca71283f545a37f8e3e002ad8c70593871453cab7"
+"checksum serial-windows 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "15c6d3b776267a75d31bbdfd5d36c0ca051251caafc285827052bc53bcdc8162"
+"checksum termios 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "d5d9cf598a6d7ce700a4e6a9199da127e6819a61e64b68609683cc9a01b5683a"
