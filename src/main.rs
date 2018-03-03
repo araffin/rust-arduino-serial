@@ -26,7 +26,7 @@ enum Order
     SERVO
 }
 
-fn convert_to_order(order: i8) -> Option<Order>
+fn convert_i8_to_order(order: i8) -> Option<Order>
 {
     match order
     {
@@ -37,7 +37,7 @@ fn convert_to_order(order: i8) -> Option<Order>
     }
 }
 
-fn convert_order_to_int(order: Order) -> i8
+fn convert_order_to_i8(order: Order) -> i8
 {
     match order
     {
@@ -58,18 +58,18 @@ fn main() {
                     };
 
     for _ in 0..2 {
-        let order = read_one_byte_int(&mut file);
+        let order = read_i8(&mut file);
         println!("Ordered received: {:?}", order);
 
-        if let Some(my_order) = convert_to_order(order)
+        if let Some(my_order) = convert_i8_to_order(order)
         {
             println!("Known order: {:?}", my_order);
             match my_order
             {
                 Order::MOTOR => {
-                    let motor_speed = read_two_bytes_int(&mut file);
+                    let motor_speed = read_i16(&mut file);
                     println!("Motor Speed = {}", motor_speed);
-                    let test = read_four_bytes_int(&mut file);
+                    let test = read_i32(&mut file);
                     println!("test = {}", test);
                 },
                 _ => ()
@@ -81,14 +81,14 @@ fn main() {
         }
     }
 
-    let order: i8 = convert_order_to_int(Order::HELLO);
-    write_one_byte_int(&mut file, order);
+    let order: i8 = convert_order_to_i8(Order::HELLO);
+    write_i8(&mut file, order);
 
-    let motor_order = convert_order_to_int(Order::MOTOR);
+    let motor_order = convert_order_to_i8(Order::MOTOR);
     let motor_speed: i16 = -56;
-    write_one_byte_int(&mut file, motor_order);
-    write_two_bytes_int(&mut file, motor_speed);
-    write_four_bytes_int(&mut file, 131072);
+    write_i8(&mut file, motor_order);
+    write_i16(&mut file, motor_speed);
+    write_i32(&mut file, 131072);
 
     // for arg in env::args_os().skip(1) {
     //     println!("opening port: {:?}", arg);
@@ -99,7 +99,7 @@ fn main() {
 }
 
 
-fn read_one_byte_int(file: &mut std::fs::File) -> i8
+fn read_i8(file: &mut std::fs::File) -> i8
 {
     let mut read_buffer = [0u8; 1];
     file.read_exact(&mut read_buffer).unwrap();
@@ -107,7 +107,7 @@ fn read_one_byte_int(file: &mut std::fs::File) -> i8
     byte
 }
 
-fn read_two_bytes_int(file: &mut std::fs::File) -> i16
+fn read_i16(file: &mut std::fs::File) -> i16
 {
     let mut read_buffer = [0u8; 2];
     file.read_exact(&mut read_buffer).unwrap();
@@ -116,7 +116,7 @@ fn read_two_bytes_int(file: &mut std::fs::File) -> i16
     param
 }
 
-fn read_four_bytes_int(file: &mut std::fs::File) -> i32
+fn read_i32(file: &mut std::fs::File) -> i32
 {
     let mut read_buffer = [0u8; 4];
     file.read_exact(&mut read_buffer).unwrap();
@@ -125,23 +125,23 @@ fn read_four_bytes_int(file: &mut std::fs::File) -> i32
     param
 }
 
-fn write_one_byte_int(file: &mut std::fs::File, num: i8)
+fn write_i8(file: &mut std::fs::File, num: i8)
 {
     let mut buffer = [0u8; 1];
     buffer[0] = unsafe {std::mem::transmute(num)};
     file.write(&buffer).unwrap();
 }
 
-fn write_two_bytes_int(file: &mut std::fs::File, num: i16)
+fn write_i16(file: &mut std::fs::File, num: i16)
 {
     let buffer = [
         (num & 0xff) as u8,
-        (num >> 8) as u8
+        (num >> 8 & 0xff) as u8
     ];
     file.write(&buffer).unwrap();
 }
 
-fn write_four_bytes_int(file: &mut std::fs::File, num: i32)
+fn write_i32(file: &mut std::fs::File, num: i32)
 {
     let buffer = [
         (num & 0xff) as u8,
