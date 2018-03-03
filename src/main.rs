@@ -19,11 +19,16 @@ use std::io::prelude::*;
 // };
 
 #[derive(Debug)]
+#[allow(non_camel_case_types)]
 enum Order
 {
     HELLO,
     MOTOR,
-    SERVO
+    SERVO,
+    ALREADY_CONNECTED,
+    ERROR,
+    RECEIVED,
+    STOP
 }
 
 fn convert_i8_to_order(order: i8) -> Option<Order>
@@ -33,6 +38,10 @@ fn convert_i8_to_order(order: i8) -> Option<Order>
         0 => Some(Order::HELLO),
         1 => Some(Order::MOTOR),
         2 => Some(Order::SERVO),
+        3 => Some(Order::ALREADY_CONNECTED),
+        4 => Some(Order::ERROR),
+        5 => Some(Order::RECEIVED),
+        6 => Some(Order::STOP),
         _ => None
     }
 }
@@ -43,7 +52,11 @@ fn convert_order_to_i8(order: Order) -> i8
     {
         Order::HELLO => 0,
         Order::MOTOR => 1,
-        Order::SERVO => 2
+        Order::SERVO => 2,
+        Order::ALREADY_CONNECTED => 3,
+        Order::ERROR => 4,
+        Order::RECEIVED => 5,
+        Order::STOP => 6
     }
 }
 
