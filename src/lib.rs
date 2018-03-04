@@ -99,18 +99,14 @@ pub fn write_i32(file: &mut std::fs::File, num: i32)
 mod tests {
     use super::*;
     use std::fs;
+    use std::fs::File;
     use std::fs::OpenOptions;
-    use std::path::Path;
 
     // Create a file
     fn create_file() -> std::fs::File
     {
         let filename = "test_file.txt";
-        if Path::new(filename).exists()
-        {
-            remove_test_file();
-        }
-        let file = match OpenOptions::new().read(true).write(true).create(true).open(filename)
+        let file = match OpenOptions::new().write(true).create(true).open(filename)
         {
             Err(why) => panic!("Could not open file {}: {}", filename, why),
             Ok(file) => file
@@ -156,7 +152,29 @@ mod tests {
 
     #[test]
     fn write_order() {
-        create_file();
+        let motor_speed: i8 = -57;
+        let servo_angle: i16 = 512; // 2^9
+        let mut file = create_file();
+        write_i8(&mut file, convert_order_to_i8(Order::MOTOR));
+        write_i8(&mut file, motor_speed);
+
+        write_i8(&mut file, convert_order_to_i8(Order::SERVO));
+        write_i16(&mut file, servo_angle);
+
+        let mut f = File::open("test_file.txt").unwrap();
+
+        let read_1st_order = convert_i8_to_order(read_i8(&mut f)).unwrap();
+        let read_motor_speed = read_i8(&mut f);
+
+        let read_2nd_order = convert_i8_to_order(read_i8(&mut f)).unwrap();
+        let read_servo_angle = read_i16(&mut f);
+
+        assert_eq!(read_1st_order, Order::MOTOR);
+        assert_eq!(read_motor_speed, motor_speed);
+
+        assert_eq!(read_2nd_order, Order::SERVO);
+        assert_eq!(read_servo_angle, servo_angle);
+
         remove_test_file();
     }
 }
