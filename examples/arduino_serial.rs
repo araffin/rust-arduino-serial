@@ -1,10 +1,10 @@
 use std::env;
 
 extern crate serial;
-extern crate serial_arduino;
+extern crate robust_arduino_serial;
 use std::time::Duration;
 use serial::prelude::*;
-use serial_arduino::*;
+use robust_arduino_serial::*;
 
 // Default settings of Arduino
 // see: https://www.arduino.cc/en/Serial/Begin

@@ -1,6 +1,6 @@
-//! # Serial Arduino
+//! # Robust Arduino Serial
 //!
-//! `serial_arduino` is a simple and robust serial communication protocol.
+//! `robust_arduino_serial` is a simple and robust serial communication protocol.
 //! It was designed to make two arduinos communicate, but can also be useful
 //! when you want a computer (e.g. a Raspberry Pi) to communicate with an Arduino.
 //!
@@ -22,10 +22,10 @@ pub enum Order
 /// # Example
 ///
 /// ```
-/// use serial_arduino::Order;
+/// use robust_arduino_serial::Order;
 ///
 /// let order: i8 = 1;  // Order::MOTOR has the index 1 in the enum
-/// let converted_order = serial_arduino::convert_i8_to_order(order).unwrap();
+/// let converted_order = robust_arduino_serial::convert_i8_to_order(order).unwrap();
 ///
 /// assert_eq!(converted_order, Order::MOTOR);
 /// ```
@@ -49,10 +49,10 @@ pub fn convert_i8_to_order(order: i8) -> Option<Order>
 /// # Example
 ///
 /// ```
-/// use serial_arduino::Order;
+/// use robust_arduino_serial::Order;
 ///
 /// let order = Order::MOTOR;
-/// let converted_order: i8 = serial_arduino::convert_order_to_i8(order);
+/// let converted_order: i8 = robust_arduino_serial::convert_order_to_i8(order);
 ///
 /// // Order::MOTOR has the index 1 in the enum
 /// assert_eq!(converted_order, 1);
@@ -79,7 +79,7 @@ pub fn convert_order_to_i8(order: Order) -> i8
 /// use std::io::Cursor;
 ///
 /// let mut buffer = Cursor::new(vec![2]);
-/// let num: i8 = serial_arduino::read_i8(&mut buffer);
+/// let num: i8 = robust_arduino_serial::read_i8(&mut buffer);
 ///
 /// assert_eq!(2, num);
 /// ```
@@ -99,7 +99,7 @@ pub fn read_i8<T: std::io::Read>(file: &mut T) -> i8
 /// use std::io::Cursor;
 /// use std::io::SeekFrom;
 /// use std::io::prelude::*;
-/// use serial_arduino::*;
+/// use robust_arduino_serial::*;
 ///
 /// let mut buffer = Cursor::new(Vec::new());
 /// let number: i16 = -355;
@@ -111,7 +111,7 @@ pub fn read_i8<T: std::io::Read>(file: &mut T) -> i8
 /// buffer.seek(SeekFrom::Start(0)).unwrap();
 ///
 /// // Read 16 bits (two bytes) from the buffer
-/// let read_number: i16 = serial_arduino::read_i16(&mut buffer);
+/// let read_number: i16 = robust_arduino_serial::read_i16(&mut buffer);
 ///
 /// assert_eq!(read_number, number);
 /// ```
@@ -132,7 +132,7 @@ pub fn read_i16<T: std::io::Read>(file: &mut T) -> i16
 /// use std::io::Cursor;
 /// use std::io::SeekFrom;
 /// use std::io::prelude::*;
-/// use serial_arduino::*;
+/// use robust_arduino_serial::*;
 ///
 /// let mut buffer = Cursor::new(Vec::new());
 /// let big_number: i32 = 16384; // 2^14
@@ -144,7 +144,7 @@ pub fn read_i16<T: std::io::Read>(file: &mut T) -> i16
 /// buffer.seek(SeekFrom::Start(0)).unwrap();
 ///
 /// // Read 32 bits (four bytes) from the buffer
-/// let read_number: i32 = serial_arduino::read_i32(&mut buffer);
+/// let read_number: i32 = robust_arduino_serial::read_i32(&mut buffer);
 ///
 /// assert_eq!(big_number, read_number);
 /// ```
@@ -166,7 +166,7 @@ pub fn read_i32<T: std::io::Read>(file: &mut T) -> i32
 /// let num: i8 = 2;
 ///
 /// // write 8 bits (one byte) to the buffer
-/// serial_arduino::write_i8(&mut buffer, num);
+/// robust_arduino_serial::write_i8(&mut buffer, num);
 /// ```
 pub fn write_i8<T: std::io::Write>(file: &mut T, num: i8)
 {
@@ -180,7 +180,7 @@ pub fn write_i8<T: std::io::Write>(file: &mut T, num: i8)
 ///
 /// ```
 /// use std::io::Cursor;
-/// use serial_arduino::*;
+/// use robust_arduino_serial::*;
 ///
 /// let mut buffer = Cursor::new(Vec::new());
 /// let number: i16 = 366;
@@ -203,7 +203,7 @@ pub fn write_i16<T: std::io::Write>(file: &mut T, num: i16)
 ///
 /// ```
 /// use std::io::Cursor;
-/// use serial_arduino::*;
+/// use robust_arduino_serial::*;
 ///
 /// let mut buffer = Cursor::new(Vec::new());
 /// let big_number: i32 = -16384; // -2^14

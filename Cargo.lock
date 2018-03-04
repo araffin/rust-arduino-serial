@@ -12,6 +12,13 @@ version = "0.2.33"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
+name = "robust-arduino-serial"
+version = "0.1.0"
+dependencies = [
+ "serial 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "serial"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -19,13 +26,6 @@ dependencies = [
  "serial-core 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serial-unix 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serial-windows 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "serial-arduino"
-version = "0.1.0"
-dependencies = [
- "serial 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]

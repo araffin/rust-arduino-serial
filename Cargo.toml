@@ -1,5 +1,5 @@
 [package]
-name = "serial-arduino"
+name = "robust-arduino-serial"
 version = "0.1.0"
 authors = ["Antonin <antonin.raffin@ensta.org>"]
 

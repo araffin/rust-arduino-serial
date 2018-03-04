@@ -3,8 +3,8 @@ use std::fs::OpenOptions;
 use std::io::SeekFrom;
 use std::io::prelude::*;
 
-extern crate serial_arduino;
-use serial_arduino::*;
+extern crate robust_arduino_serial;
+use robust_arduino_serial::*;
 
 
 fn main() {
