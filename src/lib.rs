@@ -1,3 +1,9 @@
+//! # Serial Arduino
+//!
+//! `serial_arduino` is a simple and robust serial communication protocol.
+//! It was designed to make two arduinos communicate, but can also be useful
+//! when you want a computer (e.g. a Raspberry Pi) to communicate with an Arduino.
+//!
 use std::io::prelude::*;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
@@ -13,6 +19,15 @@ pub enum Order
     STOP
 }
 
+/// Convert an int to an Order
+///
+/// # Examples
+///
+/// ```
+/// let order: i8 = 1;
+/// // converted_order = Order::MOTOR
+/// let converted_order = serial_arduino::convert_i8_to_order(order).unwrap();
+/// ```
 pub fn convert_i8_to_order(order: i8) -> Option<Order>
 {
     match order
