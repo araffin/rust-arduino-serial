@@ -19,12 +19,15 @@ pub enum Order
 
 /// Convert an int to an Order
 ///
-/// # Examples
+/// # Example
 ///
 /// ```
-/// let order: i8 = 1;
-/// // converted_order = Order::MOTOR
+/// use serial_arduino::Order;
+///
+/// let order: i8 = 1;  // Order::MOTOR has the index 1 in the enum
 /// let converted_order = serial_arduino::convert_i8_to_order(order).unwrap();
+///
+/// assert_eq!(converted_order, Order::MOTOR);
 /// ```
 pub fn convert_i8_to_order(order: i8) -> Option<Order>
 {
@@ -41,6 +44,19 @@ pub fn convert_i8_to_order(order: i8) -> Option<Order>
     }
 }
 
+/// Convert an Order to an int
+///
+/// # Example
+///
+/// ```
+/// use serial_arduino::Order;
+///
+/// let order = Order::MOTOR;
+/// let converted_order: i8 = serial_arduino::convert_order_to_i8(order);
+///
+/// // Order::MOTOR has the index 1 in the enum
+/// assert_eq!(converted_order, 1);
+/// ```
 pub fn convert_order_to_i8(order: Order) -> i8
 {
     match order
@@ -55,6 +71,18 @@ pub fn convert_order_to_i8(order: Order) -> i8
     }
 }
 
+/// Read one byte from a file/serial port and convert it to a 8 bits int
+///
+/// # Example
+///
+/// ```
+/// use std::io::Cursor;
+///
+/// let mut buffer = Cursor::new(vec![2]);
+/// let num: i8 = serial_arduino::read_i8(&mut buffer);
+///
+/// assert_eq!(2, num);
+/// ```
 pub fn read_i8<T: std::io::Read>(file: &mut T) -> i8
 {
     let mut read_buffer = [0u8; 1];
@@ -63,6 +91,30 @@ pub fn read_i8<T: std::io::Read>(file: &mut T) -> i8
     byte
 }
 
+/// Read two bytes from a file/serial port and convert it to a 16 bits int
+///
+/// # Example
+///
+/// ```
+/// use std::io::Cursor;
+/// use std::io::SeekFrom;
+/// use std::io::prelude::*;
+/// use serial_arduino::*;
+///
+/// let mut buffer = Cursor::new(Vec::new());
+/// let number: i16 = -355;
+///
+/// // Write the number to the buffer
+/// write_i16(&mut buffer, number);
+///
+/// // Go to the beginning of the buffer
+/// buffer.seek(SeekFrom::Start(0)).unwrap();
+///
+/// // Read 16 bits (two bytes) from the buffer
+/// let read_number: i16 = serial_arduino::read_i16(&mut buffer);
+///
+/// assert_eq!(read_number, number);
+/// ```
 pub fn read_i16<T: std::io::Read>(file: &mut T) -> i16
 {
     let mut read_buffer = [0u8; 2];
@@ -72,6 +124,30 @@ pub fn read_i16<T: std::io::Read>(file: &mut T) -> i16
     param
 }
 
+/// Read four bytes from a file/serial port and convert it to a 32 bits int
+///
+/// # Example
+///
+/// ```
+/// use std::io::Cursor;
+/// use std::io::SeekFrom;
+/// use std::io::prelude::*;
+/// use serial_arduino::*;
+///
+/// let mut buffer = Cursor::new(Vec::new());
+/// let big_number: i32 = 16384; // 2^14
+///
+/// // Write the number to the buffer
+/// write_i32(&mut buffer, big_number);
+///
+/// // Go to the beginning of the buffer
+/// buffer.seek(SeekFrom::Start(0)).unwrap();
+///
+/// // Read 32 bits (four bytes) from the buffer
+/// let read_number: i32 = serial_arduino::read_i32(&mut buffer);
+///
+/// assert_eq!(big_number, read_number);
+/// ```
 pub fn read_i32<T: std::io::Read>(file: &mut T) -> i32
 {
     let mut read_buffer = [0u8; 4];
@@ -81,12 +157,37 @@ pub fn read_i32<T: std::io::Read>(file: &mut T) -> i32
     param
 }
 
+/// Write one byte int to a file/serial port
+///
+/// # Example
+///
+/// ```
+/// let mut buffer = Vec::new();
+/// let num: i8 = 2;
+///
+/// // write 8 bits (one byte) to the buffer
+/// serial_arduino::write_i8(&mut buffer, num);
+/// ```
 pub fn write_i8<T: std::io::Write>(file: &mut T, num: i8)
 {
     let buffer = [num as u8];
     file.write(&buffer).unwrap();
 }
 
+/// Write two bytes int to a file/serial port
+///
+/// # Example
+///
+/// ```
+/// use std::io::Cursor;
+/// use serial_arduino::*;
+///
+/// let mut buffer = Cursor::new(Vec::new());
+/// let number: i16 = 366;
+///
+/// // write 16 bits (two bytes) to the buffer
+/// write_i16(&mut buffer, number);
+/// ```
 pub fn write_i16<T: std::io::Write>(file: &mut T, num: i16)
 {
     let buffer = [
@@ -96,6 +197,20 @@ pub fn write_i16<T: std::io::Write>(file: &mut T, num: i16)
     file.write(&buffer).unwrap();
 }
 
+/// Write four bytes int to a file/serial port
+///
+/// # Example
+///
+/// ```
+/// use std::io::Cursor;
+/// use serial_arduino::*;
+///
+/// let mut buffer = Cursor::new(Vec::new());
+/// let big_number: i32 = -16384; // -2^14
+///
+/// // write 32 bits (four bytes) to the buffer
+/// write_i32(&mut buffer, big_number);
+/// ```
 pub fn write_i32<T: std::io::Write>(file: &mut T, num: i32)
 {
     let buffer = [
@@ -111,37 +226,9 @@ pub fn write_i32<T: std::io::Write>(file: &mut T, num: i32)
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::fs;
-    use std::fs::File;
-    use std::fs::OpenOptions;
-
-    const FILENAME: &'static str = "test_file.txt";
-
-    // Create a file
-    fn create_file() -> std::fs::File
-    {
-        let file = match OpenOptions::new().write(true).create(true).open(FILENAME)
-        {
-            Err(why) => panic!("Could not open file {}: {}", FILENAME, why),
-            Ok(file) => file
-        };
-        file
-    }
-
-    fn remove_test_file()
-    {
-        match fs::remove_file(FILENAME)
-        {
-            Err(why) => panic!("Could not remove test file: {}", why),
-            Ok(_) => ()
-        };
-    }
-
-    #[test]
-    fn create_delete_test_file() {
-        create_file();
-        remove_test_file();
-    }
+    use std::io::Cursor;
+    use std::io::SeekFrom;
+    use std::io::prelude::*;
 
     #[test]
     fn test_order_conversion()
@@ -168,20 +255,30 @@ mod tests {
     fn read_write_orders() {
         let motor_speed: i8 = -57;
         let servo_angle: i16 = 512; // 2^9
-        let mut file = create_file();
-        write_i8(&mut file, convert_order_to_i8(Order::MOTOR));
-        write_i8(&mut file, motor_speed);
+        let big_number: i32 = -32768; // -2^15
 
-        write_i8(&mut file, convert_order_to_i8(Order::SERVO));
-        write_i16(&mut file, servo_angle);
+        let mut buffer = Cursor::new(Vec::new());
 
-        let mut f = File::open(FILENAME).unwrap();
+        write_i8(&mut buffer, convert_order_to_i8(Order::MOTOR));
+        write_i8(&mut buffer, motor_speed);
 
-        let read_1st_order = convert_i8_to_order(read_i8(&mut f)).unwrap();
-        let read_motor_speed = read_i8(&mut f);
+        write_i8(&mut buffer, convert_order_to_i8(Order::SERVO));
+        write_i16(&mut buffer, servo_angle);
 
-        let read_2nd_order = convert_i8_to_order(read_i8(&mut f)).unwrap();
-        let read_servo_angle = read_i16(&mut f);
+        write_i8(&mut buffer, convert_order_to_i8(Order::ERROR));
+        write_i32(&mut buffer, big_number);
+
+        // Go to the beginning of the buffer
+        buffer.seek(SeekFrom::Start(0)).unwrap();
+
+        let read_1st_order = convert_i8_to_order(read_i8(&mut buffer)).unwrap();
+        let read_motor_speed = read_i8(&mut buffer);
+
+        let read_2nd_order = convert_i8_to_order(read_i8(&mut buffer)).unwrap();
+        let read_servo_angle = read_i16(&mut buffer);
+
+        let read_3rd_order = convert_i8_to_order(read_i8(&mut buffer)).unwrap();
+        let read_big_number = read_i32(&mut buffer);
 
         assert_eq!(read_1st_order, Order::MOTOR);
         assert_eq!(read_motor_speed, motor_speed);
@@ -189,6 +286,7 @@ mod tests {
         assert_eq!(read_2nd_order, Order::SERVO);
         assert_eq!(read_servo_angle, servo_angle);
 
-        remove_test_file();
+        assert_eq!(read_3rd_order, Order::ERROR);
+        assert_eq!(read_big_number, big_number);
     }
 }
