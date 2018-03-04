@@ -6,6 +6,8 @@
 //!
 use std::io::prelude::*;
 
+pub mod arduino;
+
 #[derive(Debug, PartialEq, Copy, Clone)]
 #[allow(non_camel_case_types)]
 pub enum Order
