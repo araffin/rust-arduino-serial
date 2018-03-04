@@ -4,10 +4,6 @@
 //! It was designed to make two arduinos communicate, but can also be useful
 //! when you want a computer (e.g. a Raspberry Pi) to communicate with an Arduino.
 //!
-use std::io::prelude::*;
-
-pub mod arduino;
-
 #[derive(Debug, PartialEq, Copy, Clone)]
 #[allow(non_camel_case_types)]
 pub enum Order
@@ -59,7 +55,7 @@ pub fn convert_order_to_i8(order: Order) -> i8
     }
 }
 
-pub fn read_i8(file: &mut std::fs::File) -> i8
+pub fn read_i8<T: std::io::Read>(file: &mut T) -> i8
 {
     let mut read_buffer = [0u8; 1];
     file.read_exact(&mut read_buffer).unwrap();
@@ -67,7 +63,7 @@ pub fn read_i8(file: &mut std::fs::File) -> i8
     byte
 }
 
-pub fn read_i16(file: &mut std::fs::File) -> i16
+pub fn read_i16<T: std::io::Read>(file: &mut T) -> i16
 {
     let mut read_buffer = [0u8; 2];
     file.read_exact(&mut read_buffer).unwrap();
@@ -76,7 +72,7 @@ pub fn read_i16(file: &mut std::fs::File) -> i16
     param
 }
 
-pub fn read_i32(file: &mut std::fs::File) -> i32
+pub fn read_i32<T: std::io::Read>(file: &mut T) -> i32
 {
     let mut read_buffer = [0u8; 4];
     file.read_exact(&mut read_buffer).unwrap();
@@ -85,13 +81,13 @@ pub fn read_i32(file: &mut std::fs::File) -> i32
     param
 }
 
-pub fn write_i8(file: &mut std::fs::File, num: i8)
+pub fn write_i8<T: std::io::Write>(file: &mut T, num: i8)
 {
     let buffer = [num as u8];
     file.write(&buffer).unwrap();
 }
 
-pub fn write_i16(file: &mut std::fs::File, num: i16)
+pub fn write_i16<T: std::io::Write>(file: &mut T, num: i16)
 {
     let buffer = [
         (num & 0xff) as u8,
@@ -100,7 +96,7 @@ pub fn write_i16(file: &mut std::fs::File, num: i16)
     file.write(&buffer).unwrap();
 }
 
-pub fn write_i32(file: &mut std::fs::File, num: i32)
+pub fn write_i32<T: std::io::Write>(file: &mut T, num: i32)
 {
     let buffer = [
         (num & 0xff) as u8,

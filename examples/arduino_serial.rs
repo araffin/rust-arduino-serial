@@ -26,15 +26,15 @@ fn main() {
         port.set_timeout(Duration::from_secs(1)).unwrap();
 
         let order: i8 = convert_order_to_i8(Order::HELLO);
-        arduino::write_i8(&mut port, order);
+        write_i8(&mut port, order);
 
         let motor_order = convert_order_to_i8(Order::MOTOR);
         let motor_speed: i8 = -56;
-        arduino::write_i8(&mut port, motor_order);
-        arduino::write_i8(&mut port, motor_speed);
+        write_i8(&mut port, motor_order);
+        write_i8(&mut port, motor_speed);
 
         for _ in 0..2 {
-            let order = arduino::read_i8(&mut port);
+            let order = read_i8(&mut port);
             println!("Ordered received: {:?}", order);
 
             if let Some(received_order) = convert_i8_to_order(order)
@@ -43,7 +43,7 @@ fn main() {
                 match received_order
                 {
                     Order::MOTOR => {
-                        let motor_speed = arduino::read_i8(&mut port);
+                        let motor_speed = read_i8(&mut port);
                         println!("Motor Speed = {}", motor_speed);
                     },
                     _ => ()
