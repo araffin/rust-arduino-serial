@@ -115,13 +115,14 @@ mod tests {
     use std::fs::File;
     use std::fs::OpenOptions;
 
+    const FILENAME: &'static str = "test_file.txt";
+
     // Create a file
     fn create_file() -> std::fs::File
     {
-        let filename = "test_file.txt";
-        let file = match OpenOptions::new().write(true).create(true).open(filename)
+        let file = match OpenOptions::new().write(true).create(true).open(FILENAME)
         {
-            Err(why) => panic!("Could not open file {}: {}", filename, why),
+            Err(why) => panic!("Could not open file {}: {}", FILENAME, why),
             Ok(file) => file
         };
         file
@@ -129,7 +130,7 @@ mod tests {
 
     fn remove_test_file()
     {
-        match fs::remove_file("test_file.txt")
+        match fs::remove_file(FILENAME)
         {
             Err(why) => panic!("Could not remove test file: {}", why),
             Ok(_) => ()
@@ -164,7 +165,7 @@ mod tests {
     }
 
     #[test]
-    fn write_order() {
+    fn read_write_orders() {
         let motor_speed: i8 = -57;
         let servo_angle: i16 = 512; // 2^9
         let mut file = create_file();
@@ -174,7 +175,7 @@ mod tests {
         write_i8(&mut file, convert_order_to_i8(Order::SERVO));
         write_i16(&mut file, servo_angle);
 
-        let mut f = File::open("test_file.txt").unwrap();
+        let mut f = File::open(FILENAME).unwrap();
 
         let read_1st_order = convert_i8_to_order(read_i8(&mut f)).unwrap();
         let read_motor_speed = read_i8(&mut f);
