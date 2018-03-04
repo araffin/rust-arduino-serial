@@ -1,11 +1,10 @@
+use std::env;
+use std::fs::OpenOptions;
 // extern crate serial;
 
-use std::env;
-// use std::time::Duration;
+extern crate serial_arduino;
+use serial_arduino::*;
 
-// use std::fs::File;
-use std::fs::OpenOptions;
-use std::io::prelude::*;
 // use serial::prelude::*;
 //
 // // Default settings of Arduino
@@ -18,47 +17,6 @@ use std::io::prelude::*;
 //     flow_control: serial::FlowNone,
 // };
 
-#[derive(Debug)]
-#[allow(non_camel_case_types)]
-enum Order
-{
-    HELLO,
-    MOTOR,
-    SERVO,
-    ALREADY_CONNECTED,
-    ERROR,
-    RECEIVED,
-    STOP
-}
-
-fn convert_i8_to_order(order: i8) -> Option<Order>
-{
-    match order
-    {
-        0 => Some(Order::HELLO),
-        1 => Some(Order::MOTOR),
-        2 => Some(Order::SERVO),
-        3 => Some(Order::ALREADY_CONNECTED),
-        4 => Some(Order::ERROR),
-        5 => Some(Order::RECEIVED),
-        6 => Some(Order::STOP),
-        _ => None
-    }
-}
-
-fn convert_order_to_i8(order: Order) -> i8
-{
-    match order
-    {
-        Order::HELLO => 0,
-        Order::MOTOR => 1,
-        Order::SERVO => 2,
-        Order::ALREADY_CONNECTED => 3,
-        Order::ERROR => 4,
-        Order::RECEIVED => 5,
-        Order::STOP => 6
-    }
-}
 
 fn main() {
     let args: Vec<String> = env::args().skip(1).collect();
@@ -109,59 +67,6 @@ fn main() {
     //
     //     interact(&mut port).unwrap();
     // }
-}
-
-
-fn read_i8(file: &mut std::fs::File) -> i8
-{
-    let mut read_buffer = [0u8; 1];
-    file.read_exact(&mut read_buffer).unwrap();
-    let byte: i8 = unsafe {std::mem::transmute(read_buffer[0])};
-    byte
-}
-
-fn read_i16(file: &mut std::fs::File) -> i16
-{
-    let mut read_buffer = [0u8; 2];
-    file.read_exact(&mut read_buffer).unwrap();
-    let tmp: u16 = ((read_buffer[0] as u16) & 0xff) | ((read_buffer[1] as u16) << 8 & 0xff00);
-    let param: i16 = unsafe {std::mem::transmute(tmp)};
-    param
-}
-
-fn read_i32(file: &mut std::fs::File) -> i32
-{
-    let mut read_buffer = [0u8; 4];
-    file.read_exact(&mut read_buffer).unwrap();
-    let tmp: u32 = ((read_buffer[0] as u32) & 0xff) | ((read_buffer[1] as u32) << 8 & 0xff00) | ((read_buffer[2] as u32) << 16 & 0xff0000) | ((read_buffer[3] as u32) << 24 & 0xff000000);
-    let param: i32 = unsafe {std::mem::transmute(tmp)};
-    param
-}
-
-fn write_i8(file: &mut std::fs::File, num: i8)
-{
-    let buffer = [num as u8];
-    file.write(&buffer).unwrap();
-}
-
-fn write_i16(file: &mut std::fs::File, num: i16)
-{
-    let buffer = [
-        (num & 0xff) as u8,
-        (num >> 8 & 0xff) as u8
-    ];
-    file.write(&buffer).unwrap();
-}
-
-fn write_i32(file: &mut std::fs::File, num: i32)
-{
-    let buffer = [
-        (num & 0xff) as u8,
-        (num >> 8 & 0xff) as u8,
-        (num >> 16 & 0xff) as u8,
-        (num >> 24 & 0xff) as u8
-    ];
-    file.write(&buffer).unwrap();
 }
 
 
