@@ -21,10 +21,10 @@ fn main() {
                         Ok(file) => file
                     };
 
-    let order: i8 = convert_order_to_i8(Order::HELLO);
+    let order = Order::HELLO as i8;
     write_i8(&mut file, order);
 
-    let motor_order = convert_order_to_i8(Order::MOTOR);
+    let motor_order = Order::MOTOR as i8;
     let motor_speed: i16 = -56;
     write_i8(&mut file, motor_order);
     write_i16(&mut file, motor_speed);

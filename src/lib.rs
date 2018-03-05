@@ -8,13 +8,13 @@
 #[allow(non_camel_case_types)]
 pub enum Order
 {
-    HELLO,
-    MOTOR,
-    SERVO,
-    ALREADY_CONNECTED,
-    ERROR,
-    RECEIVED,
-    STOP
+    HELLO = 0,
+    MOTOR = 1,
+    SERVO = 2,
+    ALREADY_CONNECTED = 3,
+    ERROR = 4,
+    RECEIVED = 5,
+    STOP = 6
 }
 
 /// Convert an int to an Order
@@ -44,33 +44,6 @@ pub fn convert_i8_to_order(order: i8) -> Option<Order>
     }
 }
 
-/// Convert an Order to an int
-///
-/// # Example
-///
-/// ```
-/// use robust_arduino_serial::Order;
-///
-/// let order = Order::MOTOR;
-/// let converted_order: i8 = robust_arduino_serial::convert_order_to_i8(order);
-///
-/// // Order::MOTOR has the index 1 in the enum
-/// assert_eq!(converted_order, 1);
-/// ```
-pub fn convert_order_to_i8(order: Order) -> i8
-{
-    match order
-    {
-        Order::HELLO => 0,
-        Order::MOTOR => 1,
-        Order::SERVO => 2,
-        Order::ALREADY_CONNECTED => 3,
-        Order::ERROR => 4,
-        Order::RECEIVED => 5,
-        Order::STOP => 6
-    }
-}
-
 /// Read one byte from a file/serial port and convert it to a 8 bits int
 ///
 /// # Example
@@ -87,8 +60,7 @@ pub fn read_i8<T: std::io::Read>(file: &mut T) -> i8
 {
     let mut read_buffer = [0u8; 1];
     file.read_exact(&mut read_buffer).unwrap();
-    let byte: i8 = unsafe {std::mem::transmute(read_buffer[0])};
-    byte
+    read_buffer[0] as i8
 }
 
 /// Read two bytes from a file/serial port and convert it to a 16 bits int
@@ -119,9 +91,8 @@ pub fn read_i16<T: std::io::Read>(file: &mut T) -> i16
 {
     let mut read_buffer = [0u8; 2];
     file.read_exact(&mut read_buffer).unwrap();
-    let tmp: u16 = ((read_buffer[0] as u16) & 0xff) | ((read_buffer[1] as u16) << 8 & 0xff00);
-    let param: i16 = unsafe {std::mem::transmute(tmp)};
-    param
+    let number: u16 = ((read_buffer[0] as u16) & 0xff) | ((read_buffer[1] as u16) << 8 & 0xff00);
+    number as i16
 }
 
 /// Read four bytes from a file/serial port and convert it to a 32 bits int
@@ -152,9 +123,8 @@ pub fn read_i32<T: std::io::Read>(file: &mut T) -> i32
 {
     let mut read_buffer = [0u8; 4];
     file.read_exact(&mut read_buffer).unwrap();
-    let tmp: u32 = ((read_buffer[0] as u32) & 0xff) | ((read_buffer[1] as u32) << 8 & 0xff00) | ((read_buffer[2] as u32) << 16 & 0xff0000) | ((read_buffer[3] as u32) << 24 & 0xff000000);
-    let param: i32 = unsafe {std::mem::transmute(tmp)};
-    param
+    let number: u32 = ((read_buffer[0] as u32) & 0xff) | ((read_buffer[1] as u32) << 8 & 0xff00) | ((read_buffer[2] as u32) << 16 & 0xff0000) | ((read_buffer[3] as u32) << 24 & 0xff000000);
+    number as i32
 }
 
 /// Write one byte int to a file/serial port
@@ -246,7 +216,6 @@ mod tests {
 
         for (i, order) in orders.iter().enumerate()
         {
-            assert_eq!(i as i8, convert_order_to_i8(*order));
             assert_eq!(convert_i8_to_order(i as i8).unwrap(), *order);
         }
     }
@@ -259,13 +228,13 @@ mod tests {
 
         let mut buffer = Cursor::new(Vec::new());
 
-        write_i8(&mut buffer, convert_order_to_i8(Order::MOTOR));
+        write_i8(&mut buffer, Order::MOTOR as i8);
         write_i8(&mut buffer, motor_speed);
 
-        write_i8(&mut buffer, convert_order_to_i8(Order::SERVO));
+        write_i8(&mut buffer, Order::SERVO as i8);
         write_i16(&mut buffer, servo_angle);
 
-        write_i8(&mut buffer, convert_order_to_i8(Order::ERROR));
+        write_i8(&mut buffer, Order::ERROR as i8);
         write_i32(&mut buffer, big_number);
 
         // Go to the beginning of the buffer

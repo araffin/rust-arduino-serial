@@ -25,10 +25,10 @@ fn main() {
         port.configure(&SETTINGS).unwrap();
         port.set_timeout(Duration::from_secs(1)).unwrap();
 
-        let order: i8 = convert_order_to_i8(Order::HELLO);
+        let order = Order::HELLO as i8;
         write_i8(&mut port, order);
 
-        let motor_order = convert_order_to_i8(Order::MOTOR);
+        let motor_order = Order::MOTOR as i8;
         let motor_speed: i8 = -56;
         write_i8(&mut port, motor_order);
         write_i8(&mut port, motor_speed);
