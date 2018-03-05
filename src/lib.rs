@@ -9,8 +9,8 @@
 pub enum Order
 {
     HELLO = 0,
-    MOTOR = 1,
-    SERVO = 2,
+    SERVO = 1,
+    MOTOR = 2,
     ALREADY_CONNECTED = 3,
     ERROR = 4,
     RECEIVED = 5,
@@ -24,7 +24,7 @@ pub enum Order
 /// ```
 /// use robust_arduino_serial::Order;
 ///
-/// let order: i8 = 1;  // Order::MOTOR has the index 1 in the enum
+/// let order: i8 = 2;  // Order::MOTOR has the index 2 in the enum
 /// let converted_order = robust_arduino_serial::convert_i8_to_order(order).unwrap();
 ///
 /// assert_eq!(converted_order, Order::MOTOR);
@@ -34,8 +34,8 @@ pub fn convert_i8_to_order(order: i8) -> Option<Order>
     match order
     {
         0 => Some(Order::HELLO),
-        1 => Some(Order::MOTOR),
-        2 => Some(Order::SERVO),
+        1 => Some(Order::SERVO),
+        2 => Some(Order::MOTOR),
         3 => Some(Order::ALREADY_CONNECTED),
         4 => Some(Order::ERROR),
         5 => Some(Order::RECEIVED),
@@ -206,8 +206,8 @@ mod tests {
         use Order::*;
         let orders: [Order; 7] = [
             HELLO,
-            MOTOR,
             SERVO,
+            MOTOR,
             ALREADY_CONNECTED,
             ERROR,
             RECEIVED,

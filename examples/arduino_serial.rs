@@ -3,6 +3,7 @@ use std::env;
 extern crate serial;
 extern crate robust_arduino_serial;
 use std::time::Duration;
+use std::thread;
 use serial::prelude::*;
 use robust_arduino_serial::*;
 
@@ -23,31 +24,39 @@ fn main() {
         println!("Opening port: {:?}", arg);
         let mut port = serial::open(&arg).unwrap();
         port.configure(&SETTINGS).unwrap();
-        port.set_timeout(Duration::from_secs(1)).unwrap();
+        // timeout of 30s
+        port.set_timeout(Duration::from_secs(30)).unwrap();
 
-        let order = Order::HELLO as i8;
-        write_i8(&mut port, order);
+        loop
+        {
+            println!("Waiting for Arduino...");
+            let order = Order::HELLO as i8;
+            write_i8(&mut port, order);
+            let received_order = convert_i8_to_order(read_i8(&mut port)).unwrap();
+            if received_order == Order::ALREADY_CONNECTED
+            {
+                break;
+            }
+            thread::sleep(Duration::from_secs(1));
+        }
+
+        println!("Connected to Arduino");
 
         let motor_order = Order::MOTOR as i8;
         let motor_speed: i8 = -56;
         write_i8(&mut port, motor_order);
         write_i8(&mut port, motor_speed);
 
-        for _ in 0..2 {
+        write_i8(&mut port, Order::SERVO as i8);
+        write_i16(&mut port, 120_i16);
+
+        for _ in 0..10 {
             let order = read_i8(&mut port);
             println!("Ordered received: {:?}", order);
 
             if let Some(received_order) = convert_i8_to_order(order)
             {
                 println!("Known order: {:?}", received_order);
-                match received_order
-                {
-                    Order::MOTOR => {
-                        let motor_speed = read_i8(&mut port);
-                        println!("Motor Speed = {}", motor_speed);
-                    },
-                    _ => ()
-                }
             }
             else
             {
