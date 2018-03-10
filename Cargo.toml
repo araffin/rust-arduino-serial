@@ -13,3 +13,4 @@ categories = ["hardware-support", "network-programming", "encoding"]
 
 [dependencies]
 serial = "0.4"
+std-semaphore = "0.1"

@@ -52,7 +52,7 @@ fn main() {
 
         for _ in 0..10 {
             let order = read_i8(&mut port);
-            println!("Ordered received: {:?}", order);
+            println!("Order received: {:?}", order);
 
             if let Some(received_order) = convert_i8_to_order(order)
             {
