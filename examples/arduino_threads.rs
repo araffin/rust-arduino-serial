@@ -58,6 +58,7 @@ fn main() {
 
     // Wrap the serial to use it in the threads
     let serial_arc = Arc::new(Mutex::new(port));
+    let serial_command = serial_arc.clone();
 
     // Exit event to notify thread when they should exit
     let exit_event = false;
@@ -72,7 +73,6 @@ fn main() {
     let n_allowed_messages = 2;
     let semaphore = Arc::new(Semaphore::new(n_allowed_messages));
     let semaphore_command = semaphore.clone();
-    let serial_command = serial_arc.clone();
 
     let mut threads = vec![];
 
