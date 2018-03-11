@@ -4,14 +4,11 @@ extern crate robust_arduino_serial;
 use std::env;
 use std::time::Duration;
 use std::thread;
-use std::io::Cursor;
 use std::sync::{Arc, Mutex};
 use std::sync::mpsc;
 use std_semaphore::Semaphore;
 use serial::prelude::*;
 use robust_arduino_serial::*;
-use std::io::Seek;
-use std::io::SeekFrom;
 
 // Default settings of Arduino
 // see: https://www.arduino.cc/en/Serial/Begin
@@ -45,7 +42,7 @@ fn main() {
         println!("Waiting for Arduino...");
         let order = Order::HELLO as i8;
         write_i8(&mut port, order);
-        let received_order = convert_i8_to_order(read_i8(&mut port)).unwrap();
+        let received_order = Order::from_i8(read_i8(&mut port)).unwrap();
         if received_order == Order::ALREADY_CONNECTED
         {
             break;
@@ -59,11 +56,8 @@ fn main() {
     let (command_sender, command_receiver) = mpsc::channel();
     let command_queue = mpsc::Sender::clone(&command_sender);
 
-    let mut buffer = Cursor::new(Vec::new());
-    // Write something in the buffer
-    write_i8(&mut buffer, Order::RECEIVED as i8);
     // Wrap the serial to use it in the threads
-    let buffer_arc = Arc::new(Mutex::new(buffer));
+    let serial_arc = Arc::new(Mutex::new(port));
 
     // Exit event to notify thread when they should exit
     let exit_event = false;
@@ -78,7 +72,7 @@ fn main() {
     let n_allowed_messages = 2;
     let semaphore = Arc::new(Semaphore::new(n_allowed_messages));
     let semaphore_command = semaphore.clone();
-    let buffer_command = buffer_arc.clone();
+    let serial_command = serial_arc.clone();
 
     let mut threads = vec![];
 
@@ -96,11 +90,11 @@ fn main() {
             println!("Sending: {:?}, {}", order, num);
 
             // Acquire lock on the buffer
-            let mut buff = buffer_command.lock().unwrap();
-            write_i8(&mut *buff, order as i8);
+            let mut buffer = serial_command.lock().unwrap();
+            write_i8(&mut *buffer, order as i8);
             match order {
-                Order::MOTOR => write_i8(&mut *buff, num as i8),
-                Order::SERVO => write_i16(&mut *buff, num as i16),
+                Order::MOTOR => write_i8(&mut *buffer, num as i8),
+                Order::SERVO => write_i16(&mut *buffer, num as i16),
                 _ => ()
             }
             exit = *exit_command.lock().unwrap();
@@ -117,14 +111,11 @@ fn main() {
         let mut exit = false;
         while !exit
         {
-            // Acquire lock on the buffer
-            let mut buff = buffer_arc.lock().unwrap();
-
-            // Go to the beginning of the buffer
-            (*buff).seek(SeekFrom::Start(0)).unwrap();
+            // Acquire lock on the serial object
+            let mut buffer = serial_arc.lock().unwrap();
 
             // Receive order from arduino
-            let received_order = convert_i8_to_order(read_i8(&mut *buff)).unwrap();
+            let received_order = Order::from_i8(read_i8(&mut *buffer)).unwrap();
 
             match received_order {
                 Order::RECEIVED => semaphore_command.release(),

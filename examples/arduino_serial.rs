@@ -39,7 +39,7 @@ fn main() {
         println!("Waiting for Arduino...");
         let order = Order::HELLO as i8;
         write_i8(&mut port, order);
-        let received_order = convert_i8_to_order(read_i8(&mut port)).unwrap();
+        let received_order = Order::from_i8(read_i8(&mut port)).unwrap();
         if received_order == Order::ALREADY_CONNECTED
         {
             break;
@@ -61,7 +61,7 @@ fn main() {
         let order = read_i8(&mut port);
         println!("Order received: {:?}", order);
 
-        if let Some(received_order) = convert_i8_to_order(order)
+        if let Some(received_order) = Order::from_i8(order)
         {
             println!("Known order: {:?}", received_order);
         }

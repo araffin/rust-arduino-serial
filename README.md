@@ -28,3 +28,8 @@ Serial communication with an Arduino: [Arduino Source Code](https://github.com/s
 ```
 cargo run --example arduino_serial /dev/ttyACM0
 ```
+
+Listen and send orders to the Arduino using threads:
+```
+cargo run --example arduino_threads /dev/ttyACM0
+```

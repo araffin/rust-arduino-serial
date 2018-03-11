@@ -44,6 +44,24 @@ pub fn convert_i8_to_order(order: i8) -> Option<Order>
     }
 }
 
+/// Shortcut for convert_i8_to_order
+///
+/// # Example
+///
+/// ```
+/// use robust_arduino_serial::Order;
+///
+/// let order: i8 = 2;  // Order::MOTOR has the index 2 in the enum
+/// let converted_order = Order::from_i8(order).unwrap();
+///
+/// assert_eq!(converted_order, Order::MOTOR);
+/// ```
+impl Order {
+    pub fn from_i8(num: i8) -> Option<Order> {
+        convert_i8_to_order(num)
+    }
+}
+
 /// Read one byte from a file/serial port and convert it to a 8 bits int
 ///
 /// # Example
@@ -216,7 +234,7 @@ mod tests {
 
         for (i, order) in orders.iter().enumerate()
         {
-            assert_eq!(convert_i8_to_order(i as i8).unwrap(), *order);
+            assert_eq!(Order::from_i8(i as i8).unwrap(), *order);
         }
     }
 
@@ -240,13 +258,13 @@ mod tests {
         // Go to the beginning of the buffer
         buffer.seek(SeekFrom::Start(0)).unwrap();
 
-        let read_1st_order = convert_i8_to_order(read_i8(&mut buffer)).unwrap();
+        let read_1st_order = Order::from_i8(read_i8(&mut buffer)).unwrap();
         let read_motor_speed = read_i8(&mut buffer);
 
-        let read_2nd_order = convert_i8_to_order(read_i8(&mut buffer)).unwrap();
+        let read_2nd_order = Order::from_i8(read_i8(&mut buffer)).unwrap();
         let read_servo_angle = read_i16(&mut buffer);
 
-        let read_3rd_order = convert_i8_to_order(read_i8(&mut buffer)).unwrap();
+        let read_3rd_order = Order::from_i8(read_i8(&mut buffer)).unwrap();
         let read_big_number = read_i32(&mut buffer);
 
         assert_eq!(read_1st_order, Order::MOTOR);

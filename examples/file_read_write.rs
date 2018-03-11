@@ -37,7 +37,7 @@ fn main() {
         let order = read_i8(&mut file);
         println!("Ordered received: {:?}", order);
 
-        if let Some(received_order) = convert_i8_to_order(order)
+        if let Some(received_order) = Order::from_i8(order)
         {
             println!("Known order: {:?}", received_order);
             match received_order
