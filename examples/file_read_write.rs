@@ -34,7 +34,7 @@ fn main() {
     file.seek(SeekFrom::Start(0)).unwrap();
 
     for _ in 0..2 {
-        let order = read_i8(&mut file);
+        let order = read_i8(&mut file).unwrap();
         println!("Ordered received: {:?}", order);
 
         if let Some(received_order) = Order::from_i8(order)
@@ -43,9 +43,9 @@ fn main() {
             match received_order
             {
                 Order::MOTOR => {
-                    let motor_speed = read_i16(&mut file);
+                    let motor_speed = read_i16(&mut file).unwrap();
                     println!("Motor Speed = {}", motor_speed);
-                    let test = read_i32(&mut file);
+                    let test = read_i32(&mut file).unwrap();
                     println!("test = {}", test);
                 },
                 _ => ()

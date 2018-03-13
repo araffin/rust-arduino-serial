@@ -34,15 +34,23 @@ fn main() {
     println!("Opening port: {:?}", serial_port);
     let mut port = serial::open(&serial_port).unwrap();
     port.configure(&SETTINGS).unwrap();
-    // timeout of 30s
-    port.set_timeout(Duration::from_secs(30)).unwrap();
+    // timeout of 1ms
+    port.set_timeout(Duration::from_millis(1)).unwrap();
 
     loop
     {
         println!("Waiting for Arduino...");
         let order = Order::HELLO as i8;
         write_i8(&mut port, order);
-        let received_order = Order::from_i8(read_i8(&mut port)).unwrap();
+        let received_order = match read_i8(&mut port) {
+            Ok(order) => Order::from_i8(order).unwrap(),
+            Err(_) => {
+                    thread::sleep(Duration::from_secs(2));
+                    continue
+                }
+
+        };
+
         if received_order == Order::ALREADY_CONNECTED
         {
             break;
@@ -91,6 +99,7 @@ fn main() {
 
             // Acquire lock on the buffer
             let mut buffer = serial_command.lock().unwrap();
+
             write_i8(&mut *buffer, order as i8);
             match order {
                 Order::MOTOR => write_i8(&mut *buffer, num as i8),
@@ -109,18 +118,36 @@ fn main() {
     let listener_thread = thread::spawn(move || {
 
         let mut exit = false;
+        let mut wait = false;
         while !exit
         {
+            // Wait a bit so the command thread can acquire the lock
+            if wait
+            {
+                thread::sleep(Duration::from_millis(100));
+            }
+
             // Acquire lock on the serial object
             let mut buffer = serial_arc.lock().unwrap();
 
             // Receive order from arduino
-            let received_order = Order::from_i8(read_i8(&mut *buffer)).unwrap();
+            let received_order = match read_i8(&mut *buffer) {
+                Ok(order) => Order::from_i8(order).unwrap(),
+                Err(_) => {
+                        wait = true;
+                        continue
+                    }
+
+            };
+            wait = false;
+
+            println!("Received: {:?}", received_order);
 
             match received_order {
                 Order::RECEIVED => semaphore_command.release(),
                 _ => ()
             }
+
             exit = *exit_listener.lock().unwrap();
         }
         println!("Listener Thread exiting...");
@@ -128,12 +155,17 @@ fn main() {
 
     threads.push(listener_thread);
 
+    thread::sleep(Duration::from_secs(1));
     // Send Orders to the Arduino
     command_queue.send((Order::MOTOR, 42_i32)).unwrap();
     command_queue.send((Order::SERVO, 120_i32)).unwrap();
 
     // Wait a bit before shutting down the threads
     thread::sleep(Duration::from_secs(2));
+
+    // Stop the motor
+    command_queue.send((Order::MOTOR, 0_i32)).unwrap();
+
 
     // Notify the threads that they should exit
     {
