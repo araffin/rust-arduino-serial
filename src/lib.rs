@@ -4,6 +4,9 @@
 //! It was designed to make two arduinos communicate, but can also be useful
 //! when you want a computer (e.g. a Raspberry Pi) to communicate with an Arduino.
 //!
+//! It works with anything that implement the io::Write and io::Read traits.
+//!
+//!
 
 use std::io;
 
@@ -98,7 +101,7 @@ pub fn read_i8<T: io::Read>(file: &mut T) -> Result<i8, io::Error>
 /// let number: i16 = -355;
 ///
 /// // Write the number to the buffer
-/// write_i16(&mut buffer, number);
+/// write_i16(&mut buffer, number).unwrap();
 ///
 /// // Go to the beginning of the buffer
 /// buffer.seek(SeekFrom::Start(0)).unwrap();
@@ -148,24 +151,28 @@ pub fn read_i32<T: io::Read>(file: &mut T) -> Result<i32, io::Error>
     Ok(number as i32)
 }
 
-/// Write one byte int to a file/serial port
+/// Write one byte int to a file/serial port.
+/// It returns the number of bytes written
 ///
 /// # Example
 ///
 /// ```
+/// use robust_arduino_serial::write_i8;
 /// let mut buffer = Vec::new();
 /// let num: i8 = 2;
 ///
 /// // write 8 bits (one byte) to the buffer
-/// robust_arduino_serial::write_i8(&mut buffer, num);
+/// write_i8(&mut buffer, num).unwrap();
 /// ```
-pub fn write_i8<T: io::Write>(file: &mut T, num: i8)
+pub fn write_i8<T: io::Write>(file: &mut T, num: i8) -> io::Result<usize>
 {
     let buffer = [num as u8];
-    file.write(&buffer).unwrap();
+    let num_bytes = file.write(&buffer)?;
+    Ok(num_bytes)
 }
 
-/// Write two bytes int to a file/serial port
+/// Write two bytes int to a file/serial port.
+/// It returns the number of bytes written
 ///
 /// # Example
 ///
@@ -177,18 +184,20 @@ pub fn write_i8<T: io::Write>(file: &mut T, num: i8)
 /// let number: i16 = 366;
 ///
 /// // write 16 bits (two bytes) to the buffer
-/// write_i16(&mut buffer, number);
+/// write_i16(&mut buffer, number).unwrap();
 /// ```
-pub fn write_i16<T: io::Write>(file: &mut T, num: i16)
+pub fn write_i16<T: io::Write>(file: &mut T, num: i16) -> io::Result<usize>
 {
     let buffer = [
         (num & 0xff) as u8,
         (num >> 8 & 0xff) as u8
     ];
-    file.write(&buffer).unwrap();
+    let num_bytes = file.write(&buffer)?;
+    Ok(num_bytes)
 }
 
-/// Write four bytes int to a file/serial port
+/// Write four bytes int to a file/serial port.
+/// It returns the number of bytes written
 ///
 /// # Example
 ///
@@ -200,9 +209,9 @@ pub fn write_i16<T: io::Write>(file: &mut T, num: i16)
 /// let big_number: i32 = -16384; // -2^14
 ///
 /// // write 32 bits (four bytes) to the buffer
-/// write_i32(&mut buffer, big_number);
+/// write_i32(&mut buffer, big_number).unwrap();
 /// ```
-pub fn write_i32<T: io::Write>(file: &mut T, num: i32)
+pub fn write_i32<T: io::Write>(file: &mut T, num: i32) -> io::Result<usize>
 {
     let buffer = [
         (num & 0xff) as u8,
@@ -210,7 +219,8 @@ pub fn write_i32<T: io::Write>(file: &mut T, num: i32)
         (num >> 16 & 0xff) as u8,
         (num >> 24 & 0xff) as u8
     ];
-    file.write(&buffer).unwrap();
+    let num_bytes = file.write(&buffer)?;
+    Ok(num_bytes)
 }
 
 
@@ -249,14 +259,14 @@ mod tests {
 
         let mut buffer = Cursor::new(Vec::new());
 
-        write_i8(&mut buffer, Order::MOTOR as i8);
-        write_i8(&mut buffer, motor_speed);
+        write_i8(&mut buffer, Order::MOTOR as i8).unwrap();
+        write_i8(&mut buffer, motor_speed).unwrap();
 
-        write_i8(&mut buffer, Order::SERVO as i8);
-        write_i16(&mut buffer, servo_angle);
+        write_i8(&mut buffer, Order::SERVO as i8).unwrap();
+        write_i16(&mut buffer, servo_angle).unwrap();
 
-        write_i8(&mut buffer, Order::ERROR as i8);
-        write_i32(&mut buffer, big_number);
+        write_i8(&mut buffer, Order::ERROR as i8).unwrap();
+        write_i32(&mut buffer, big_number).unwrap();
 
         // Go to the beginning of the buffer
         buffer.seek(SeekFrom::Start(0)).unwrap();

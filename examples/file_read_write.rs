@@ -22,13 +22,13 @@ fn main() {
                     };
 
     let order = Order::HELLO as i8;
-    write_i8(&mut file, order);
+    write_i8(&mut file, order).unwrap();
 
     let motor_order = Order::MOTOR as i8;
     let motor_speed: i16 = -56;
-    write_i8(&mut file, motor_order);
-    write_i16(&mut file, motor_speed);
-    write_i32(&mut file, 131072);
+    write_i8(&mut file, motor_order).unwrap();
+    write_i16(&mut file, motor_speed).unwrap();
+    write_i32(&mut file, 131072).unwrap();
 
     // Go to the beginning of the file
     file.seek(SeekFrom::Start(0)).unwrap();

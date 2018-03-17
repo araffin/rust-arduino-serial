@@ -1,6 +1,7 @@
 extern crate std_semaphore;
 extern crate serial;
 extern crate robust_arduino_serial;
+use std::io::ErrorKind;
 use std::env;
 use std::time::Duration;
 use std::thread;
@@ -41,12 +42,16 @@ fn main() {
     {
         println!("Waiting for Arduino...");
         let order = Order::HELLO as i8;
-        write_i8(&mut port, order);
+        write_i8(&mut port, order).unwrap();
         let received_order = match read_i8(&mut port) {
             Ok(order) => Order::from_i8(order).unwrap(),
-            Err(_) => {
-                    thread::sleep(Duration::from_secs(2));
-                    continue
+            Err(ref e) if e.kind() == ErrorKind::TimedOut => {
+                // If we have a read timeout, wait a bit
+                thread::sleep(Duration::from_secs(2));
+                continue
+                }
+            Err(e) => {
+                    panic!("An error occured reading serial port: {}", e)
                 }
 
         };
@@ -100,12 +105,12 @@ fn main() {
             // Acquire lock on the buffer
             let mut buffer = serial_command.lock().unwrap();
 
-            write_i8(&mut *buffer, order as i8);
+            write_i8(&mut *buffer, order as i8).unwrap();
             match order {
-                Order::MOTOR => write_i8(&mut *buffer, num as i8),
-                Order::SERVO => write_i16(&mut *buffer, num as i16),
-                _ => ()
-            }
+                Order::MOTOR => write_i8(&mut *buffer, num as i8).unwrap(),
+                Order::SERVO => write_i16(&mut *buffer, num as i16).unwrap(),
+                _ => 0  // Write 0 bytes
+            };
             exit = *exit_command.lock().unwrap();
         }
         println!("Command Thread exiting...");

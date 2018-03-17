@@ -38,7 +38,7 @@ fn main() {
     {
         println!("Waiting for Arduino...");
         let order = Order::HELLO as i8;
-        write_i8(&mut port, order);
+        write_i8(&mut port, order).unwrap();
         let received_order = Order::from_i8(read_i8(&mut port).unwrap()).unwrap();
         if received_order == Order::ALREADY_CONNECTED
         {
@@ -51,11 +51,11 @@ fn main() {
 
     let motor_order = Order::MOTOR as i8;
     let motor_speed: i8 = -56;
-    write_i8(&mut port, motor_order);
-    write_i8(&mut port, motor_speed);
+    write_i8(&mut port, motor_order).unwrap();
+    write_i8(&mut port, motor_speed).unwrap();
 
-    write_i8(&mut port, Order::SERVO as i8);
-    write_i16(&mut port, 120_i16);
+    write_i8(&mut port, Order::SERVO as i8).unwrap();
+    write_i16(&mut port, 120_i16).unwrap();
 
     for _ in 0..10 {
         let order = read_i8(&mut port).unwrap();
