@@ -68,6 +68,25 @@ impl Order {
     }
 }
 
+/// Read one byte from a file/serial port and convert it to an order
+///
+/// # Example
+///
+/// ```
+/// use std::io::Cursor;
+/// use robust_arduino_serial::*;
+///
+/// let mut buffer = Cursor::new(vec![2]);
+/// let order = read_order(&mut buffer).unwrap().unwrap();
+/// // Order::MOTOR has the index 2 in the enum
+/// assert_eq!(Order::MOTOR, order);
+/// ```
+pub fn read_order<T: io::Read>(file: &mut T) -> Result<Option<Order>, io::Error>
+{
+    let order = read_i8(file)?;
+    Ok(Order::from_i8(order))
+}
+
 /// Read one byte from a file/serial port and convert it to a 8 bits int
 ///
 /// # Example
@@ -149,6 +168,24 @@ pub fn read_i32<T: io::Read>(file: &mut T) -> Result<i32, io::Error>
     file.read_exact(&mut read_buffer)?;
     let number: u32 = ((read_buffer[0] as u32) & 0xff) | ((read_buffer[1] as u32) << 8 & 0xff00) | ((read_buffer[2] as u32) << 16 & 0xff0000) | ((read_buffer[3] as u32) << 24 & 0xff000000);
     Ok(number as i32)
+}
+
+/// Write an order to a file/serial port.
+/// It returns the number of bytes written
+///
+/// # Example
+///
+/// ```
+/// use robust_arduino_serial::write_order;
+/// use robust_arduino_serial::Order;
+/// let mut buffer = Vec::new();
+///
+/// // write the order (one byte) to the buffer
+/// write_order(&mut buffer, Order::HELLO).unwrap();
+/// ```
+pub fn write_order<T: io::Write>(file: &mut T, order: Order) -> io::Result<usize>
+{
+    write_i8(file, order as i8)
 }
 
 /// Write one byte int to a file/serial port.
@@ -259,10 +296,10 @@ mod tests {
 
         let mut buffer = Cursor::new(Vec::new());
 
-        write_i8(&mut buffer, Order::MOTOR as i8).unwrap();
+        write_order(&mut buffer, Order::MOTOR).unwrap();
         write_i8(&mut buffer, motor_speed).unwrap();
 
-        write_i8(&mut buffer, Order::SERVO as i8).unwrap();
+        write_order(&mut buffer, Order::SERVO).unwrap();
         write_i16(&mut buffer, servo_angle).unwrap();
 
         write_i8(&mut buffer, Order::ERROR as i8).unwrap();
@@ -271,7 +308,7 @@ mod tests {
         // Go to the beginning of the buffer
         buffer.seek(SeekFrom::Start(0)).unwrap();
 
-        let read_1st_order = Order::from_i8(read_i8(&mut buffer).unwrap()).unwrap();
+        let read_1st_order = read_order(&mut buffer).unwrap().unwrap();
         let read_motor_speed = read_i8(&mut buffer).unwrap();
 
         let read_2nd_order = Order::from_i8(read_i8(&mut buffer).unwrap()).unwrap();

@@ -21,8 +21,8 @@ fn main() {
                         Ok(file) => file
                     };
 
-    let order = Order::HELLO as i8;
-    write_i8(&mut file, order).unwrap();
+    // write_order is equivalent to write_i8
+    write_order(&mut file, Order::HELLO).unwrap();
 
     let motor_order = Order::MOTOR as i8;
     let motor_speed: i16 = -56;
@@ -34,6 +34,7 @@ fn main() {
     file.seek(SeekFrom::Start(0)).unwrap();
 
     for _ in 0..2 {
+        // We could have also use read_order(&mut file).unwrap()
         let order = read_i8(&mut file).unwrap();
         println!("Ordered received: {:?}", order);
 

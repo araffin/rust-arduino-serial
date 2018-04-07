@@ -41,8 +41,7 @@ fn main() {
     loop
     {
         println!("Waiting for Arduino...");
-        let order = Order::HELLO as i8;
-        write_i8(&mut port, order).unwrap();
+        write_order(&mut port, Order::HELLO).unwrap();
         let received_order = match read_i8(&mut port) {
             Ok(order) => Order::from_i8(order).unwrap(),
             Err(ref e) if e.kind() == ErrorKind::TimedOut => {
@@ -105,7 +104,7 @@ fn main() {
             // Acquire lock on the buffer
             let mut buffer = serial_command.lock().unwrap();
 
-            write_i8(&mut *buffer, order as i8).unwrap();
+            write_order(&mut *buffer, order).unwrap();
             match order {
                 Order::MOTOR => write_i8(&mut *buffer, num as i8).unwrap(),
                 Order::SERVO => write_i16(&mut *buffer, num as i16).unwrap(),
