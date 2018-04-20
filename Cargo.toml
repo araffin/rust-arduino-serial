@@ -8,7 +8,7 @@ repository = "https://github.com/araffin/rust-arduino-serial"
 documentation = "https://github.com/araffin/arduino-robust-serial"
 license = "MIT"
 readme = "README.md"
-keywords = ["serial", "hardware", "arduino", "RS232", "communication", "protocol", "raspberry"]
+keywords = ["serial", "hardware", "arduino", "communication", "protocol"]
 categories = ["hardware-support", "network-programming", "encoding"]
 
 [dependencies]
