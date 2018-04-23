@@ -15,6 +15,10 @@ Implementations are available in various programming languages:
 - [C++](https://github.com/araffin/cpp-arduino-serial)
 - [Rust](https://github.com/araffin/rust-arduino-serial)
 
+## Using the Crate
+
+Please see [Crates.io](https://crates.io/crates/robust-arduino-serial). You need to add only one line to your `Cargo.toml`.
+
 ## Tests
 Compile and run the tests:
 ```
